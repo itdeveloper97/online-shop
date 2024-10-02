@@ -3,15 +3,31 @@ import { TypeBar } from "src/widgets/type-bar/TypeBar";
 import { BrandBar } from "src/widgets/brand-bar/BrandBar";
 import { DeviceList } from "src/widgets/device-list/DeviceList";
 import { useStore } from "src/store/hooks/useStore";
+import { DevicePages } from "src/widgets/device-pages/DevicePages";
+import { observer } from "mobx-react-lite";
 
-export const ShopPage = () => {
+export const ShopPage = observer(() => {
   const { device } = useStore();
 
   useEffect(() => {
     device.fetchTypes();
     device.fetchBrands();
-    device.fetchDevice();
   }, [device]);
+
+  useEffect(() => {
+    device.fetchDevice({
+      typeId: device.selectedType?.id || null,
+      brandId: device.selectedBrand?.id || null,
+      page: device.page,
+      limit: device.limit,
+    });
+  }, [
+    device,
+    device.selectedType,
+    device.selectedBrand,
+    device.page,
+    device.limit,
+  ]);
 
   return (
     <div
@@ -23,7 +39,8 @@ export const ShopPage = () => {
       <div className={"col-span-3 flex flex-col gap-2"}>
         <BrandBar />
         <DeviceList />
+        <DevicePages />
       </div>
     </div>
   );
-};
+});
